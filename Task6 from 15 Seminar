@@ -1,0 +1,23 @@
+# Напишите код, который запускается из командной строки и получает на вход путь до директории на ПК.
+# Соберите информацию о содержимом в виде объектов namedtuple.
+# Каждый объект хранит:
+# ○ имя файла без расширения или название каталога,
+# ○ расширение, если это файл,
+# ○ флаг каталога,
+# ○ название родительского каталога.
+# В процессе сбора сохраните данные в текстовый файл используя логирование
+
+import argparse
+import os
+
+parser = argparse.ArgumentParser(prog='Final certification', description='Task-1', epilog='Returns the different mean')
+
+parser.add_argument('numbers', metavar='N', type=str, nargs='*', help='press some numbers')
+parser.add_argument('-ln', metavar='ln', type=str, help='Введите фамилию', default="None")
+args = parser.parse_args()
+
+directory = args.ln
+files = os.listdir(directory) # список всех файлов по переданной ссылке
+
+print(files)
+
