@@ -1,0 +1,116 @@
+# За основу была взята 3 задачка из Урока 13 "Исключения"
+class InvalidNameError(Exception):
+    def __init__(self, text):
+        self.text = text
+
+    def __str__(self):
+        return f"Invalid name: {self.text}. Name should be a string."
+
+
+class InvalidAgeError(Exception):
+    def __init__(self, text):
+        self.text = text
+
+    def __str__(self):
+        return f"Invalid age: {self.text}. Name should be a integer."
+
+
+class InvalidIdError(Exception):
+    def __init__(self, text):
+        self.text = text
+
+    def __str__(self):
+        return f"Invalid ID: {self.text}. Name should be a integer."
+
+
+class Person:
+    def __init__(self, last_name, first_name, patronymic, age):
+
+        if isinstance(last_name, str):
+            self.last_name = last_name
+        else:
+            logger.error(f'\nValueError: last_name должен быть <str>. Введен type ({type(last_name)})')
+            raise InvalidNameError(last_name)
+
+        if isinstance(first_name, str):
+            self.first_name = first_name
+        else:
+            logger.error(f'\nValueError: first_name должен быть <str>. Введен type ({type(last_name)})')
+            raise InvalidNameError(first_name)
+
+        if isinstance(patronymic, str):
+            self.patronymic = patronymic
+        else:
+            logger.error(f'\nValueError: patronymic должен быть <str>. Введен type ({type(last_name)})')
+            raise InvalidNameError(patronymic)
+
+        self.age = age # проверка этого атрибута не требуется так как она была сделана при инициализации
+
+
+
+    def birthday(self):
+        self.age += 1
+        logger.info(f'\nС днем рождения {self.last_name} {self.first_name} {self.patronymic}! '
+            f'Вам исполнилось {self.age}')
+
+    def get_age(self):
+        return self.age
+
+    def set_age(self, age):
+        if isinstance(self.age, int):
+            self.age = age
+        else:
+            logger.error(f'\nValueError: patronymic должен быть <int>. Введен type ({type(self.age)})')
+            raise InvalidAgeError(self.age)
+
+
+class Employee(Person):
+    def __init__(self, last_name, first_name, patronymic, age, id):
+        super().__init__(last_name, first_name, patronymic, age)
+        self.id = id
+
+        logger.info(f"\nСоздан новый обьект!\nФамилия:{self.last_name}|Имя:{self.first_name}"
+                    f"|Отчество:{self.patronymic}|Возраст:{self.age}|ID:{self.id}")
+
+    def get_level(self):
+        level_of_user = self.id % 7
+        logger.info(f'\nУровень {self.last_name} {self.first_name} {self.patronymic} - {level_of_user}')
+        return level_of_user
+
+
+import logging
+import argparse
+if __name__ == '__main__':
+    # Логгирование
+    logger = logging.getLogger(__name__)
+    FORMAT = '{levelname:<8} - {asctime}. В модуле "{name}" в строке {lineno:03d} функция "{funcName}()" сообщила: {msg}'
+    logging.basicConfig(format=FORMAT, style='{', filename='project.log.', filemode='w', encoding='utf-8',
+                        level=logging.INFO)  # сохранаяю результаты лоиггирования в отдельный файл
+    logging.basicConfig(level=logging.WARNING)  # присвоение уровня логгера
+    logger = logging.getLogger('Итоговая аттестация')  # название логгера
+    ###
+
+    parser = argparse.ArgumentParser(prog='Final certification', description='Task-1', epilog='Returns the different mean')
+
+    parser.add_argument('numbers', metavar='N', type=str, nargs='*', help='press some numbers')
+    parser.add_argument('-ln', metavar='ln', type=str, help='Введите фамилию', default="None")
+    parser.add_argument('-fn', metavar='fn', type=str, help='Введите имя', default="None")
+    parser.add_argument('-pt', metavar='pt', type=str, help='Введите отчество', default="None")
+    parser.add_argument('-a', metavar='a', type=str, help='Введите возраст', default="None")
+    parser.add_argument('-id', metavar='id', type=str, help='Введите id', default="None")
+
+    args = parser.parse_args()
+    try:
+        age = int(args.a)
+    except ValueError:
+        logger.critical(f'\nValueError: Age должен быть <int>. Введен type ({type(args.a)})')
+        age = 0
+
+    try:
+        id = int(args.id)
+    except ValueError:
+        logger.critical(f'\nValueError: Age должен быть <int>. Введен type ({type(args.id)})')
+        id = 0
+
+    Employee(args.ln, args.fn, args.pt, age, id)
+
