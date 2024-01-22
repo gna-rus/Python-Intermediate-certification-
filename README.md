@@ -20,7 +20,10 @@
 Информация сохраняется в файл **class.json**
 
 ### Task3 from 13 Seminar
+В Task3 from 13 Seminar за основу обралась задачка №3 из 13 семинара. 
 
+В программе реализована система ввода из строки терминала. Пример ввода:
+**python test1.py -ln Ivanov -fn Ivan -pt Ivaovoch -a 30 -id 12345**
 
 
 ### Task6 from 15 Seminar
