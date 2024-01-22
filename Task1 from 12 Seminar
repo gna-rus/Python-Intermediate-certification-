@@ -4,7 +4,6 @@ import os
 import logging
 import json
 
-import csv
 
 class Student:
     # Из кода удален метод load_subjects, так как он не актуален для новой версии кода
@@ -25,6 +24,7 @@ class Student:
     - get_average_grade(self): возвращает средний балл по всем предметам
     - add_grade(self, subject, grade): добавление оценки по предмету
     - add_test_score(self, subject, test_score): добавление результата теста по предмету
+    - open_file(self): извлекает информаю о студенте из файла и передает ее в subjects
     """
 
     def __init__(self, name):
@@ -34,6 +34,7 @@ class Student:
     def __setattr__(self, name, value):
         if name == 'name':
             if not value.replace(' ', '').isalpha() or not value.istitle():
+                logger.warning("ФИО должно состоять только из букв и начинаться с заглавной буквы")
                 raise ValueError("ФИО должно состоять только из букв и начинаться с заглавной буквы")
         super().__setattr__(name, value)
 
@@ -42,6 +43,7 @@ class Student:
         if name in self.subjects:
             return self.subjects[name]
         else:
+            logger.warning(f"Предмет {name} не найден")
             raise AttributeError(f"Предмет {name} не найден")
 
     def __str__(self):
@@ -51,6 +53,7 @@ class Student:
         if subject not in self.subjects:
             self.subjects[subject] = {'grades': [], 'test_scores': []}
         if not isinstance(grade, int) or grade < 2 or grade > 5:
+            logger.warning("Оценка должна быть целым числом от 2 до 5")
             raise ValueError("Оценка должна быть целым числом от 2 до 5")
         self.subjects[subject]['grades'].append(grade)
 
@@ -58,11 +61,13 @@ class Student:
         if subject not in self.subjects:
             self.subjects[subject] = {'grades': [], 'test_scores': []}
         if not isinstance(test_score, int) or test_score < 0 or test_score > 100:
+            logger.warning("Результат теста должен быть целым числом от 0 до 100")
             raise ValueError("Результат теста должен быть целым числом от 0 до 100")
         self.subjects[subject]['test_scores'].append(test_score)
 
     def get_average_test_score(self, subject):
         if subject not in self.subjects:
+            logger.critical(f"Предмет {subject} не найден")
             raise ValueError(f"Предмет {subject} не найден")
         test_scores = self.subjects[subject]['test_scores']
         if len(test_scores) == 0:
@@ -79,7 +84,6 @@ class Student:
             return 0
         return sum(total_grades) / len(total_grades)
 
-    # извлекаю информаю о студенте из файла
     def open_file(self):
         with open("class.json", encoding="utf8") as file:
             return dict(json.load(file))
@@ -145,16 +149,20 @@ if funcion_number == "1":
 
 elif funcion_number == "2":
     average_grade = student.get_average_grade()
-    print(f"Средний балл: {average_grade}")
+    print(f"Средний балл по всем предметам: {average_grade}")
     average_test_score_math = student.get_average_test_score("Математика")
     print(f"Средний результат по тестам по математике: {average_test_score_math}")
 
     average_test_score_history = student.get_average_test_score("История")
     print(f"Средний результат по тестам по математике: {average_test_score_history}")
 
+else:
+    logger.critical("Неверный ввод")
+
 print(student.subjects)
 
 # сохраняю в файл
 with open(f"class.json", "w", encoding='utf-8') as file:
-    json.dump(student.subjects, file, indent=4, ensure_ascii=False)
+    json.dump(student.subjects, file, indent=2, ensure_ascii=False)
+    logger.info("Данные сохранены")
 
