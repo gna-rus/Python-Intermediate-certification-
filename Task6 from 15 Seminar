@@ -21,33 +21,31 @@ logging.basicConfig(level=logging.INFO)  # присвоение уровня л�
 logger = logging.getLogger('Информация о файлах и папках')  # название логгера
 
 def generate_of_namedtuple(directory):
+    print(directory)
 
     global list_of_date
     directory += "\\"
     files = os.listdir(directory)  # список всех файлов по переданной ссылке
-    # files = list(os.walk(directory)) # если раскоментировать то выдаст список всех файлов и папок
+    # files = list(os.walk(directory)) # выдаст список всех файлов и папок
 
     for i in files:
         # проверка, по ссылке находится файл или директория
-        par_dir = os.path.dirname(f'{i}')[2:]  # определение родительской дирректории
-        par_dir = par_dir.replace("\\\\", "\\")
+        parent_dir = lambda path: os.path.abspath(os.path.join(path, os.pardir))
+        par_dir = parent_dir(str(directory  + f"{i}"))
 
         if os.path.isfile(f'{directory}\{i}'):
-
             list_of_date.append(generate_of_namedtuple_file(str(i), par_dir))
         else:
-
+            generate_of_namedtuple(f'{directory}\{i}') # рекурсия для прохождения по всем папкам
             list_of_date.append(generate_of_namedtuple_folder(str(i), par_dir))
 
-    for i in list_of_date:
-        print(i)
 
 
 def generate_of_namedtuple_file(file, directory):
     basename, extension = os.path.splitext(file) # извлекаю из названия файла имя файла и его расширение
     Result = namedtuple("File", ["Name", "Type_file", "Parent_directory"])
     res = Result(basename, extension, directory)
-    logger.info('Файл')
+    logger.info('Определен файл')
     return res
 
 def generate_of_namedtuple_folder(folder, directory):
@@ -55,7 +53,7 @@ def generate_of_namedtuple_folder(folder, directory):
     directory = directory.replace("\\\\", "\\")
     Result = namedtuple("Folder", ["Name", "Parent_directory"])
     res = Result(folder, directory)
-    logger.info("Папка")
+    logger.info("Определена папка")
     return res
 
 
@@ -66,5 +64,18 @@ parser.add_argument('-ln', metavar='ln', type=str, help='Введите фами
 args = parser.parse_args()
 
 directory = args.ln
-print(directory)
-generate_of_namedtuple(directory)
+
+# Проверка на существование дирректроии
+if os.path.isdir(directory):
+    print(directory)
+    generate_of_namedtuple(directory)
+    for i in list_of_date:
+        print(i)
+        logger.info(f"\nОпределено:  {i}")
+else:
+    logger.critical("Дирректроия неверная!")
+
+
+
+
+
