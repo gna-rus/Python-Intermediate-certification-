@@ -9,6 +9,55 @@
 
 import argparse
 import os
+from collections import namedtuple
+import logging
+
+list_of_date = []
+
+FORMAT = '{levelname:<8} - {asctime}. В модуле "{name}" в строке {lineno:03d} функция "{funcName}()" в {created} секунд записала сообщение: {msg}'
+logging.basicConfig(format=FORMAT, style='{', filename='project.log.', filemode='w', encoding='utf-8',
+                    level=logging.INFO)  # сохранаяю результаты лоиггирования в отдельный файл
+logging.basicConfig(level=logging.INFO)  # присвоение уровня логгера
+logger = logging.getLogger('Информация о файлах и папках')  # название логгера
+
+def generate_of_namedtuple(directory):
+
+    global list_of_date
+    directory += "\\"
+    files = os.listdir(directory)  # список всех файлов по переданной ссылке
+    # files = list(os.walk(directory)) # если раскоментировать то выдаст список всех файлов и папок
+
+    for i in files:
+        # проверка, по ссылке находится файл или директория
+        par_dir = os.path.dirname(f'{i}')[2:]  # определение родительской дирректории
+        par_dir = par_dir.replace("\\\\", "\\")
+
+        if os.path.isfile(f'{directory}\{i}'):
+
+            list_of_date.append(generate_of_namedtuple_file(str(i), par_dir))
+        else:
+
+            list_of_date.append(generate_of_namedtuple_folder(str(i), par_dir))
+
+    for i in list_of_date:
+        print(i)
+
+
+def generate_of_namedtuple_file(file, directory):
+    basename, extension = os.path.splitext(file) # извлекаю из названия файла имя файла и его расширение
+    Result = namedtuple("File", ["Name", "Type_file", "Parent_directory"])
+    res = Result(basename, extension, directory)
+    logger.info('Файл')
+    return res
+
+def generate_of_namedtuple_folder(folder, directory):
+    folder = folder[(folder.rfind("\\") +1):] # нахожу название файла по ссылке
+    directory = directory.replace("\\\\", "\\")
+    Result = namedtuple("Folder", ["Name", "Parent_directory"])
+    res = Result(folder, directory)
+    logger.info("Папка")
+    return res
+
 
 parser = argparse.ArgumentParser(prog='Final certification', description='Task-1', epilog='Returns the different mean')
 
@@ -17,7 +66,5 @@ parser.add_argument('-ln', metavar='ln', type=str, help='Введите фами
 args = parser.parse_args()
 
 directory = args.ln
-files = os.listdir(directory) # список всех файлов по переданной ссылке
-
-print(files)
-
+print(directory)
+generate_of_namedtuple(directory)
