@@ -1,0 +1,160 @@
+import csv
+import argparse
+import os
+import logging
+import json
+
+import csv
+
+class Student:
+    # Из кода удален метод load_subjects, так как он не актуален для новой версии кода
+    """
+    Класс, представляющий студента.
+
+    Атрибуты:
+    - name (str): ФИО студента
+    - subjects (dict): словарь, содержащий предметы и их оценки и результаты тестов
+
+    Методы:
+    - __init__(self, name, subjects_file): конструктор класса
+    - __setattr__(self, name, value): дескриптор, проверяющий ФИО на первую заглавную букву и наличие только букв
+    - __getattr__(self, name): получение значения атрибута
+    - __str__(self): возвращает строковое представление студента
+    - load_subjects(self, subjects_file): загрузка предметов из файла CSV
+    - get_average_test_score(self, subject): возвращает средний балл по тестам для заданного предмета
+    - get_average_grade(self): возвращает средний балл по всем предметам
+    - add_grade(self, subject, grade): добавление оценки по предмету
+    - add_test_score(self, subject, test_score): добавление результата теста по предмету
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.subjects = self.open_file() # информацию о студенте извлекаю из файла
+
+    def __setattr__(self, name, value):
+        if name == 'name':
+            if not value.replace(' ', '').isalpha() or not value.istitle():
+                raise ValueError("ФИО должно состоять только из букв и начинаться с заглавной буквы")
+        super().__setattr__(name, value)
+
+
+    def __getattr__(self, name):
+        if name in self.subjects:
+            return self.subjects[name]
+        else:
+            raise AttributeError(f"Предмет {name} не найден")
+
+    def __str__(self):
+        return f"Студент: {self.name}\nПредметы: {', '.join(self.subjects.keys())}"
+
+    def add_grade(self, subject, grade):
+        if subject not in self.subjects:
+            self.subjects[subject] = {'grades': [], 'test_scores': []}
+        if not isinstance(grade, int) or grade < 2 or grade > 5:
+            raise ValueError("Оценка должна быть целым числом от 2 до 5")
+        self.subjects[subject]['grades'].append(grade)
+
+    def add_test_score(self, subject, test_score):
+        if subject not in self.subjects:
+            self.subjects[subject] = {'grades': [], 'test_scores': []}
+        if not isinstance(test_score, int) or test_score < 0 or test_score > 100:
+            raise ValueError("Результат теста должен быть целым числом от 0 до 100")
+        self.subjects[subject]['test_scores'].append(test_score)
+
+    def get_average_test_score(self, subject):
+        if subject not in self.subjects:
+            raise ValueError(f"Предмет {subject} не найден")
+        test_scores = self.subjects[subject]['test_scores']
+        if len(test_scores) == 0:
+            return 0
+        return sum(test_scores) / len(test_scores)
+
+    def get_average_grade(self):
+        total_grades = []
+        for subject in self.subjects:
+            grades = self.subjects[subject]['grades']
+            if len(grades) > 0:
+                total_grades.extend(grades)
+        if len(total_grades) == 0:
+            return 0
+        return sum(total_grades) / len(total_grades)
+
+    # извлекаю информаю о студенте из файла
+    def open_file(self):
+        with open("class.json", encoding="utf8") as file:
+            return dict(json.load(file))
+
+
+FORMAT = '{levelname:<8} - {asctime}. В модуле "{name}" в строке {lineno:03d} функция "{funcName}()" в {created} секунд записала сообщение: {msg}'
+logging.basicConfig(format=FORMAT, style='{', filename='project.log.', filemode='w', encoding='utf-8',
+                    level=logging.INFO)  # сохранаяю результаты лоиггирования в отдельный файл
+logging.basicConfig(level=logging.INFO)  # присвоение уровня логгера
+logger = logging.getLogger('Информация о студентах')  # название логгера
+
+
+parser = argparse.ArgumentParser(prog='Final certification', description='Task-3', epilog='Returns the different mean')
+
+parser.add_argument('-ln', metavar='ln', type=str, help='Введите фамилию', default="None")
+parser.add_argument('-fn', metavar='ln', type=str, help='Введите имя', default="None")
+parser.add_argument('-dn', metavar='ln', type=str, help='Название файла для сохранения', default="subjects.csv")
+parser.add_argument('-mc', metavar='ln', type=str, help='Оценку для студента за урок по математике', default="None")
+parser.add_argument('-hc', metavar='ln', type=str, help='Оценку для студента за урок по истории', default="None")
+parser.add_argument('-mt', metavar='ln', type=str, help='Оценку для студента за тест по математике', default="None")
+parser.add_argument('-ht', metavar='ln', type=str, help='Оценку для студента за тест по истории', default="None")
+
+parser.add_argument('-fc', metavar='ln', type=str, help='Введите действие.\n1-Добавить информацию о студенте и его оценке\2-вывести среднее значение по всем студентам', default="1")
+
+args = parser.parse_args()
+
+last_name = args.ln # Фамилия
+first_name = args.fn # Имя
+file_name = args.dn # Название файла для сохранения
+
+try:
+    math_score = int(args.mc) # Оценка за урок по математике
+    history_score = int(args.hc) # Оценка за урок по истории
+
+    math_test = int(args.mt) # Оценка за зачет по математике
+    history_test = int(args.ht) # Оценка за зачет по истории
+except ValueError:
+    logger.critical("Не корректный формат ввода оценки")
+    print("Не корректный формат ввода оценки")
+    quit()
+
+funcion_number = args.fc # меню
+
+
+student = Student(f"{last_name} {first_name}")
+
+if funcion_number == "1":
+    # Добавляю оценку за урок
+    if math_score != "None":
+        student.add_grade("Математика", math_score)
+        logger.info("Оценка за урок Математики добавлена")
+    if history_score != "None":
+        student.add_grade("История", history_score)
+        logger.info("Оценка за урок Истории добавлена")
+
+    # Добавляю оценку за тест
+    if math_test != "None":
+        student.add_test_score("Математика", math_test)
+        logger.info("Оценка за тест по Математике добавлена")
+    if history_test != "None":
+        student.add_test_score("История", history_test)
+        logger.info("Оценка за тест по Истории добавлена")
+
+elif funcion_number == "2":
+    average_grade = student.get_average_grade()
+    print(f"Средний балл: {average_grade}")
+    average_test_score_math = student.get_average_test_score("Математика")
+    print(f"Средний результат по тестам по математике: {average_test_score_math}")
+
+    average_test_score_history = student.get_average_test_score("История")
+    print(f"Средний результат по тестам по математике: {average_test_score_history}")
+
+print(student.subjects)
+
+# сохраняю в файл
+with open(f"class.json", "w", encoding='utf-8') as file:
+    json.dump(student.subjects, file, indent=4, ensure_ascii=False)
+
