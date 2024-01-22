@@ -1,5 +1,5 @@
-# Python-Intermediate-certification-
-## Промежуточная атестационная работа
+# Промежуточная атестационная работа
+### Task1 from 12 Seminar
 В Task1 from 12 Seminar брался за основу код из Д\з Задачки 1 "Урок 12. ООП. Финал" 
 В программе реализована система ввода из строки терминала. Пример ввода:
 python file.py -ln Ivanov -fn Ivan -mc 4 -mt 89 -hc 3 -ht 76 -fc 2
