@@ -24,7 +24,7 @@
 
 В программе реализована система ввода из строки терминала. Пример ввода:
 
-**python test1.py -ln Ivanov -fn Ivan -pt Ivaovoch -a 30 -id 12345**
+**python file.py -ln Ivanov -fn Ivan -pt Ivaovoch -a 30 -id 12345**
 
 
 ### Task6 from 15 Seminar
