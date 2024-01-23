@@ -21,6 +21,11 @@ logging.basicConfig(level=logging.INFO)  # присвоение уровня л�
 logger = logging.getLogger('Информация о файлах и папках')  # название логгера
 
 def generate_of_namedtuple(directory):
+    """
+    Функция заполняет глобальный список переменными типа namedtuple. Каждая переменна содержит в себе информацию о файле или папке
+
+    :return: None
+    """
     print(directory)
 
     global list_of_date
@@ -42,6 +47,11 @@ def generate_of_namedtuple(directory):
 
 
 def generate_of_namedtuple_file(file, directory):
+    """
+    Функция принимает в себя дирректорию и название файла, на основе их создает новую переменную содержащую информацию о файле    
+
+    :return: type(res) == nametuple
+    """
     basename, extension = os.path.splitext(file) # извлекаю из названия файла имя файла и его расширение
     Result = namedtuple("File", ["Name", "Type_file", "Parent_directory"])
     res = Result(basename, extension, directory)
@@ -49,6 +59,11 @@ def generate_of_namedtuple_file(file, directory):
     return res
 
 def generate_of_namedtuple_folder(folder, directory):
+    """
+    Функция принимает в себя дирректорию и название папки, на основе их создает новую переменную содержащую информацию о папке    
+
+    :return: type(res) == nametuple
+    """
     folder = folder[(folder.rfind("\\") +1):] # нахожу название файла по ссылке
     directory = directory.replace("\\\\", "\\")
     Result = namedtuple("Folder", ["Name", "Parent_directory"])
@@ -74,8 +89,3 @@ if os.path.isdir(directory):
         logger.info(f"\nОпределено:  {i}")
 else:
     logger.critical("Дирректроия неверная!")
-
-
-
-
-
