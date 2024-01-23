@@ -1,5 +1,9 @@
 # За основу была взята 3 задачка из Урока 13 "Исключения"
 class InvalidNameError(Exception):
+    """
+    Класс ошибки. Срабатывает когда введен неправильный тип имени и фамилии
+    """
+
     def __init__(self, text):
         self.text = text
 
@@ -8,6 +12,10 @@ class InvalidNameError(Exception):
 
 
 class InvalidAgeError(Exception):
+    """
+    Класс ошибки. Срабатывает когда введен неправильный тип возраста
+    """
+
     def __init__(self, text):
         self.text = text
 
@@ -16,6 +24,10 @@ class InvalidAgeError(Exception):
 
 
 class InvalidIdError(Exception):
+    """
+    Класс ошибки. Срабатывает когда введен неправильный тип ID
+    """
+
     def __init__(self, text):
         self.text = text
 
@@ -24,6 +36,17 @@ class InvalidIdError(Exception):
 
 
 class Person:
+    """
+    Класс является родительским. При инициализации проводит проверку типов
+    - last_name - фамилия сотрудника (str)
+    - first_name - имя сотрудника (str)
+    - patronymic - отчество сотрудника (str)
+    - age - возраст сотрудника (int)
+    birthday(self): функция не принимает параметры, изменяет возраст обьекта
+    get_age(self): функция не принимает параметры, возвращает возраст обьекта
+    set_age(self, int): функция принимает параметр и устанавливает новое значение атрибута age
+    """
+
     def __init__(self, last_name, first_name, patronymic, age):
 
         if isinstance(last_name, str):
@@ -44,16 +67,15 @@ class Person:
             logger.error(f'\nValueError: patronymic должен быть <str>. Введен type ({type(last_name)})')
             raise InvalidNameError(patronymic)
 
-        self.age = age # проверка этого атрибута не требуется так как она была сделана при инициализации
-
-
+        self.age = age  # проверка этого атрибута не требуется так как она была сделана при инициализации
 
     def birthday(self):
         self.age += 1
         logger.info(f'\nС днем рождения {self.last_name} {self.first_name} {self.patronymic}! '
-            f'Вам исполнилось {self.age}')
+                    f'Вам исполнилось {self.age}')
 
     def get_age(self):
+        logger.info(f"Запрос на возраст {self.last_name} {self.first_name}. Передано значение {self.age}")
         return self.age
 
     def set_age(self, age):
@@ -65,6 +87,17 @@ class Person:
 
 
 class Employee(Person):
+    """
+    Класс является дочерним от класса Person и создает обьекты (сотрудники).
+    - last_name - фамилия сотрудника (str). Извлекает из родительского класса
+    - first_name - имя сотрудника (str). Извлекает из родительского класса
+    - patronymic - отчество сотрудника (str). Извлекает из родительского класса
+    - age - возраст сотрудника (int). Извлекает из родительского класса
+    - id - номер сотрудника (int)
+
+    get_level(self): функция ничего не принимает и определяет уровень сотрудника
+    """
+
     def __init__(self, last_name, first_name, patronymic, age, id):
         super().__init__(last_name, first_name, patronymic, age)
         self.id = id
@@ -80,6 +113,7 @@ class Employee(Person):
 
 import logging
 import argparse
+
 if __name__ == '__main__':
     # Логгирование
     logger = logging.getLogger(__name__)
@@ -90,7 +124,8 @@ if __name__ == '__main__':
     logger = logging.getLogger('Итоговая аттестация')  # название логгера
     ###
 
-    parser = argparse.ArgumentParser(prog='Final certification', description='Task-1', epilog='Returns the different mean')
+    parser = argparse.ArgumentParser(prog='Final certification', description='Task-1',
+                                     epilog='Returns the different mean')
 
     parser.add_argument('numbers', metavar='N', type=str, nargs='*', help='press some numbers')
     parser.add_argument('-ln', metavar='ln', type=str, help='Введите фамилию', default="None")
@@ -112,5 +147,9 @@ if __name__ == '__main__':
         logger.critical(f'\nValueError: Age должен быть <int>. Введен type ({type(args.id)})')
         id = 0
 
-    Employee(args.ln, args.fn, args.pt, age, id)
-
+    person1 = Employee(args.ln, args.fn, args.pt, age, id)
+    person1.birthday()
+    person1.get_level()
+    person1.get_age()
+    person1.set_age(40)
+    person1.get_age()
