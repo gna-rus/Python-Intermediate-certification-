@@ -20,6 +20,7 @@ logging.basicConfig(format=FORMAT, style='{', filename='project.log.', filemode=
 logging.basicConfig(level=logging.INFO)  # присвоение уровня логгера
 logger = logging.getLogger('Информация о файлах и папках')  # название логгера
 
+
 def generate_of_namedtuple(directory):
     """
     Функция заполняет глобальный список переменными типа namedtuple. Каждая переменна содержит в себе информацию о файле или папке
@@ -36,35 +37,35 @@ def generate_of_namedtuple(directory):
     for i in files:
         # проверка, по ссылке находится файл или директория
         parent_dir = lambda path: os.path.abspath(os.path.join(path, os.pardir))
-        par_dir = parent_dir(str(directory  + f"{i}"))
+        par_dir = parent_dir(str(directory + f"{i}"))
 
         if os.path.isfile(f'{directory}\{i}'):
             list_of_date.append(generate_of_namedtuple_file(str(i), par_dir))
         else:
-            generate_of_namedtuple(f'{directory}\{i}') # рекурсия для прохождения по всем папкам
+            generate_of_namedtuple(f'{directory}\{i}')  # рекурсия для прохождения по всем папкам
             list_of_date.append(generate_of_namedtuple_folder(str(i), par_dir))
-
 
 
 def generate_of_namedtuple_file(file, directory):
     """
-    Функция принимает в себя дирректорию и название файла, на основе их создает новую переменную содержащую информацию о файле    
+    Функция принимает в себя дирректорию и название файла, на основе их создает новую переменную содержащую информацию о файле
 
     :return: type(res) == nametuple
     """
-    basename, extension = os.path.splitext(file) # извлекаю из названия файла имя файла и его расширение
+    basename, extension = os.path.splitext(file)  # извлекаю из названия файла имя файла и его расширение
     Result = namedtuple("File", ["Name", "Type_file", "Parent_directory"])
     res = Result(basename, extension, directory)
     logger.info('Определен файл')
     return res
 
+
 def generate_of_namedtuple_folder(folder, directory):
     """
-    Функция принимает в себя дирректорию и название папки, на основе их создает новую переменную содержащую информацию о папке    
+    Функция принимает в себя дирректорию и название папки, на основе их создает новую переменную содержащую информацию о папке
 
     :return: type(res) == nametuple
     """
-    folder = folder[(folder.rfind("\\") +1):] # нахожу название файла по ссылке
+    folder = folder[(folder.rfind("\\") + 1):]  # нахожу название файла по ссылке
     directory = directory.replace("\\\\", "\\")
     Result = namedtuple("Folder", ["Name", "Parent_directory"])
     res = Result(folder, directory)
