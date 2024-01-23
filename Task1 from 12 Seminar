@@ -6,7 +6,6 @@ import json
 
 
 class Student:
-    # Из кода удален метод load_subjects, так как он не актуален для новой версии кода
     """
     Класс, представляющий студента.
 
@@ -29,7 +28,7 @@ class Student:
 
     def __init__(self, name):
         self.name = name
-        self.subjects = self.open_file() # информацию о студенте извлекаю из файла
+        self.subjects = self.open_file()  # информацию о студенте извлекаю из файла
 
     def __setattr__(self, name, value):
         if name == 'name':
@@ -37,7 +36,6 @@ class Student:
                 logger.warning("ФИО должно состоять только из букв и начинаться с заглавной буквы")
                 raise ValueError("ФИО должно состоять только из букв и начинаться с заглавной буквы")
         super().__setattr__(name, value)
-
 
     def __getattr__(self, name):
         if name in self.subjects:
@@ -95,7 +93,6 @@ logging.basicConfig(format=FORMAT, style='{', filename='project.log.', filemode=
 logging.basicConfig(level=logging.INFO)  # присвоение уровня логгера
 logger = logging.getLogger('Информация о студентах')  # название логгера
 
-
 parser = argparse.ArgumentParser(prog='Final certification', description='Task-3', epilog='Returns the different mean')
 
 parser.add_argument('-ln', metavar='ln', type=str, help='Введите фамилию', default="None")
@@ -106,27 +103,28 @@ parser.add_argument('-hc', metavar='ln', type=str, help='Оценку для с�
 parser.add_argument('-mt', metavar='ln', type=str, help='Оценку для студента за тест по математике', default="None")
 parser.add_argument('-ht', metavar='ln', type=str, help='Оценку для студента за тест по истории', default="None")
 
-parser.add_argument('-fc', metavar='ln', type=str, help='Введите действие.\n1-Добавить информацию о студенте и его оценке\2-вывести среднее значение по всем студентам', default="1")
+parser.add_argument('-fc', metavar='ln', type=str,
+                    help='Введите действие.\n1-Добавить информацию о студенте и его оценке\2-вывести среднее значение по всем студентам',
+                    default="1")
 
 args = parser.parse_args()
 
-last_name = args.ln # Фамилия
-first_name = args.fn # Имя
-file_name = args.dn # Название файла для сохранения
+last_name = args.ln  # Фамилия
+first_name = args.fn  # Имя
+file_name = args.dn  # Название файла для сохранения
 
 try:
-    math_score = int(args.mc) # Оценка за урок по математике
-    history_score = int(args.hc) # Оценка за урок по истории
+    math_score = int(args.mc)  # Оценка за урок по математике
+    history_score = int(args.hc)  # Оценка за урок по истории
 
-    math_test = int(args.mt) # Оценка за зачет по математике
-    history_test = int(args.ht) # Оценка за зачет по истории
+    math_test = int(args.mt)  # Оценка за зачет по математике
+    history_test = int(args.ht)  # Оценка за зачет по истории
 except ValueError:
     logger.critical("Не корректный формат ввода оценки")
     print("Не корректный формат ввода оценки")
     quit()
 
-funcion_number = args.fc # меню
-
+funcion_number = args.fc  # меню
 
 student = Student(f"{last_name} {first_name}")
 
@@ -165,4 +163,3 @@ print(student.subjects)
 with open(f"class.json", "w", encoding='utf-8') as file:
     json.dump(student.subjects, file, indent=2, ensure_ascii=False)
     logger.info("Данные сохранены")
-
